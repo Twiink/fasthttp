@@ -8,6 +8,31 @@ import (
 	"time"
 )
 
+func TestCookieSetPathPreservesValue(t *testing.T) {
+	t.Parallel()
+
+	for _, path := range []string{"/team%2Fblue", "/my%20app", "/%E4%B8%AD", "/app//admin", "/app/../admin"} {
+		for _, useBytes := range []bool{false, true} {
+			var c Cookie
+			c.SetKey("sid")
+			c.SetValue("sample")
+			if useBytes {
+				c.SetPathBytes([]byte(path))
+			} else {
+				c.SetPath(path)
+			}
+			if string(c.Path()) != path {
+				t.Errorf("bytes=%v: path = %q, want %q", useBytes, c.Path(), path)
+			}
+			response := &http.Response{Header: http.Header{"Set-Cookie": {c.String()}}}
+			cookies := response.Cookies()
+			if len(cookies) != 1 || cookies[0].Path != path {
+				t.Errorf("bytes=%v: Set-Cookie = %q, want path %q", useBytes, c.String(), path)
+			}
+		}
+	}
+}
+
 func TestCookiePanic(t *testing.T) {
 	t.Parallel()
 

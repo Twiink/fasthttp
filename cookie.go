@@ -158,19 +158,15 @@ func (c *Cookie) Path() []byte {
 	return c.path
 }
 
-// SetPath sets cookie path.
+// SetPath sets cookie path without URL decoding or normalization.
 func (c *Cookie) SetPath(path string) {
-	c.bufK = append(c.bufK[:0], path...)
-	c.path = normalizePath(c.path, c.bufK)
-	c.path = removeNewLines(c.path)
+	c.path = initHeaderValueString(c.path, path)
 	c.path = removeSemicolons(c.path)
 }
 
-// SetPathBytes sets cookie path.
+// SetPathBytes sets cookie path without URL decoding or normalization.
 func (c *Cookie) SetPathBytes(path []byte) {
-	c.bufK = append(c.bufK[:0], path...)
-	c.path = normalizePath(c.path, c.bufK)
-	c.path = removeNewLines(c.path)
+	c.path = initHeaderValueBytes(c.path, path)
 	c.path = removeSemicolons(c.path)
 }
 
